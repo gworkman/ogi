@@ -1,4 +1,4 @@
-# Ogi
+# OGI
 
 Generates and serves OpenGraph Images using Typst.
 
@@ -32,17 +32,9 @@ defmodule BlogWeb.ImageController do
   alias Blog.Posts
 
   def show(conn, %{"id" => blog_id}) do
-    post = Posts.get_post_by_id(blog_id)
-
-    if post do
-      assigns = [
-        title: post.title,
-      ]
-
-      Ogi.render_image(conn, "#{blog_id}.png", typst_markup(), assigns)
-    else
-      send_resp(conn, 404, "Not found")
-    end
+    post = Posts.get_post_by_id!(blog_id)
+    assigns = [title: post.title]
+    Ogi.render_image(conn, "#{blog_id}.png", typst_markup(), assigns)
   end
 
   defp typst_markup do
@@ -50,11 +42,38 @@ defmodule BlogWeb.ImageController do
     #
     # You can dynamically inline variables with:
     # Blog Title: <%= title %>
+    #
+    # Note: There is *no* @ before the variable other than in HEEx templates!
   end
 end
 ```
 
-Then you add this
+Then add this route to your router:
+
+```elixir
+scope "/", BlogWeb do
+  get "/og-image/:id", ImageController, :show
+end
+```
+
+For adding dynamic Metatags, I recommend the [Metatags](https://github.com/johantell/metatags) library:
+
+```elixir
+# In your Controller or LiveView serving the blog post, add this:
+def handle_params(%{"id" => post_id}, _url, socket) do
+  post = Posts.get_post_by_id!(post_id)
+
+  socket =
+    socket
+    |> Metatags.put("og:title", post.title)
+    |> Metatags.put("og:description", post.description)
+    |> Metatags.put("og:image", url(~p"/og-image/#{post_id}"))
+
+  {:ok, socket}
+end
+```
+
+And that's it! You can test this by navigating to the route manually or by using a browser extension that previews OpenGraph information for a website.
 
 ## ToDo's
 
