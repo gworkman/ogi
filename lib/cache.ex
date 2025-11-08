@@ -1,5 +1,7 @@
 defmodule Ogi.Cache do
-  require Logger
+  @moduledoc """
+  Caches the rendered images based on their filename and assigns in a temporary folder.
+  """
 
   @doc """
   Maybe returns `{:ok, cached_image}`, but only if the Cache is enabled
@@ -8,7 +10,6 @@ defmodule Ogi.Cache do
   """
   def maybe_get_cached_image(filename, assigns) do
     if cache_enabled?() do
-      Logger.debug("Cache enabled. Fetching image from cache.")
       get(filename, assigns)
     else
       {:error, :not_found}
@@ -23,7 +24,6 @@ defmodule Ogi.Cache do
   """
   def maybe_put_image(filename, assigns, content) do
     if cache_enabled?() do
-      Logger.debug("Cache enabled. Putting image into cache.")
       put(filename, assigns, content)
     else
       :ok
@@ -81,6 +81,21 @@ defmodule Ogi.Cache do
     cache_dir()
     |> Path.join(cache_key)
     |> File.write(content)
+  end
+
+  @doc """
+  Cleans out the cache by deleting all stored files.
+  """
+  def clean!() do
+    cache_dir()
+    |> File.ls!()
+    |> Enum.each(fn file ->
+      cache_dir()
+      |> Path.join(file)
+      |> File.rm!()
+    end)
+
+    :ok
   end
 
   defp cache_dir do

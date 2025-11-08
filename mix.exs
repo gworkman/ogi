@@ -7,6 +7,8 @@ defmodule Ogi.MixProject do
       version: "0.1.0",
       elixir: "~> 1.18",
       start_permanent: Mix.env() == :prod,
+      description: "Renders OpenGraph Images using Typst",
+      package: package(),
       deps: deps()
     ]
   end
@@ -22,7 +24,18 @@ defmodule Ogi.MixProject do
   defp deps do
     [
       {:typst, "~> 0.1"},
-      {:plug, ">= 0.0.0"}
+      {:plug, ">= 0.0.0"},
+      {:ex_doc, "~> 0.39", only: :dev, runtime: false}
+    ]
+  end
+
+  defp package() do
+    [
+      name: "ogi",
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE*
+                CHANGELOG*),
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/pjullrich/ogi"}
     ]
   end
 end

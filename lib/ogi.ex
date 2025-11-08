@@ -1,6 +1,8 @@
 defmodule Ogi do
   @moduledoc """
-  Documentation for `Ogi`.
+  Renders OpenGraph Images (or really any image you'd like) to PNG using Typst.
+
+  Optionally caches the rendered images based on their filename and assigns in a temporary folder.
   """
 
   require Logger

@@ -19,9 +19,14 @@ end
 You need these three things:
 
 1. A Typst template.
-    - LLMs are pretty good at generating those and you can test them quickly on [typst.app/play](https://typst.app/play/)
 2. A Phoenix Controller and Route.
 3. An `og:image` metatag in your `<head>` tag.
+
+### 1. The Typst Template
+
+LLMs are pretty good at generating those and you can test them quickly on [typst.app/play](https://typst.app/play/)
+
+### 2. The Phoenix Controller and Route
 
 Below is an example controller for serving OG Images for a blog post.
 
@@ -56,6 +61,8 @@ scope "/", BlogWeb do
 end
 ```
 
+### 3. The Metatag
+
 For adding dynamic Metatags, I recommend the [Metatags](https://github.com/johantell/metatags) library:
 
 ```elixir
@@ -75,8 +82,32 @@ end
 
 And that's it! You can test this by navigating to the route manually or by using a browser extension that previews OpenGraph information for a website.
 
+## Configuration
+
+Currently, OGI only supports the following configuration:
+
+```elixir
+# Whether to cache rendered images or not (default: true)
+config :ogi, cache: true|false
+```
+
+## Caveats
+
+### Missing fonts
+
+You need to use a font that is available on your system, otherwise Typst will fall back to a `serif` font, unless you set `fallback: false` on a `#text` which means Tyst will simply not render the text at all.
+
+For local development, you can run `typst fonts` to list all available fonts.
+
+For remote deployment, I recommend researching which fonts are installed by default on your runner OS, for example on [Debian](https://wiki.debian.org/Fonts). You can always install the font you like with the package manager and it will become automatically available to Typst.
+
 ## ToDo's
 
+- [ ] Emoji Support
 - [ ] Clean up Cache when a certain size is reached
 - [ ] Add fallback OG Image option if render fails
-- [ ]
+- [ ] Support for templates
+- [ ] Make cache dir path configurable.
+- [ ] Allow per-request disabling of fetch/put/both cache operations
+- [ ] Allow async rendering. Useful for cache warmup.
+- [ ] Unit tests 😬
